@@ -1,239 +1,339 @@
 import streamlit as st
 
 st.set_page_config(
-    page_title="NIVO — Cognitive Balance Operating System",
+    page_title="NIVO — Cognitive Balance OS",
     page_icon="⚖️",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
 
-# Custom High-End Cyber Blue / Deep Obsidian Dark Design System
+# Ultra-Refined Anthracite Titanium & Mobile Responsive System
 st.markdown("""<style>
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+    --bg-base: #090b0e;
+    --card-surface: #12151d;
+    --card-surface-hover: #171c26;
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-highlight: rgba(148, 163, 184, 0.28);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
+    --accent-titanium: #cbd5e1;
+    --accent-cyan: #38bdf8;
+}
 
 html, body, [class*="css"] {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #06090e;
-    color: #e2e8f0;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
 }
 
 .stApp {
-    background: radial-gradient(circle at 50% -20%, #0d2238 0%, #070e17 40%, #04070c 100%);
+    background: radial-gradient(circle at 50% -12%, #1a202c 0%, #0b0e13 55%, #06070a 100%);
 }
 
-#MainMenu, header, footer {visibility: hidden;}
+#MainMenu, header, footer {visibility: hidden; display: none;}
 .block-container {
-    padding-top: 1.8rem;
-    padding-bottom: 3rem;
-    max-width: 1140px;
+    padding-top: 1.2rem !important;
+    padding-bottom: 2.5rem !important;
+    max-width: 1080px !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
 }
 
-/* Glassmorphism Card Architecture */
+/* Nivo Cards */
 .nivo-card {
-    background: linear-gradient(135deg, rgba(13, 27, 44, 0.65) 0%, rgba(9, 17, 28, 0.85) 100%);
-    border: 1px solid rgba(56, 189, 248, 0.18);
-    border-radius: 16px;
-    padding: 22px;
-    box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(14px);
-    margin-bottom: 18px;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    background: var(--card-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 18px 20px;
+    box-shadow: 0 4px 22px -4px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    margin-bottom: 12px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .nivo-card:hover {
-    border-color: rgba(56, 189, 248, 0.38);
-    box-shadow: 0 14px 36px -10px rgba(14, 165, 233, 0.18);
+    border-color: var(--border-highlight);
+    background: var(--card-surface-hover);
 }
 
-/* Premium Navigation Header */
-.nav-container {
+/* Navigation Shell */
+.nav-shell {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 26px;
-    background: rgba(10, 18, 30, 0.75);
-    border: 1px solid rgba(56, 189, 248, 0.22);
-    border-radius: 18px;
-    backdrop-filter: blur(20px);
-    margin-bottom: 28px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    padding: 12px 18px;
+    background: rgba(15, 18, 25, 0.85);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    margin-bottom: 22px;
 }
 
-.brand-wrapper {
+.brand-combo {
     display: flex;
     align-items: center;
     gap: 14px;
 }
 
-.brand-name {
-    font-size: 23px;
+.brand-text-nivo {
+    font-size: 21px;
     font-weight: 800;
-    letter-spacing: 0.2em;
-    background: linear-gradient(135deg, #ffffff 20%, #7dd3fc 70%, #0284c7 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.18em;
+    color: #ffffff;
+    line-height: 1.1;
 }
 
-.status-badge {
-    background: rgba(14, 165, 233, 0.12);
-    color: #38bdf8;
-    border: 1px solid rgba(56, 189, 248, 0.32);
-    padding: 6px 14px;
-    border-radius: 9999px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
+.brand-subline {
+    font-size: 9.5px;
+    color: var(--text-tertiary);
+    letter-spacing: 0.1em;
     text-transform: uppercase;
+    font-weight: 600;
+}
+
+.badge-pill {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--accent-titanium);
+    border: 1px solid var(--border-subtle);
+    padding: 5px 12px;
+    border-radius: 9999px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 6px;
 }
 
-.status-pulse {
-    width: 7px;
-    height: 7px;
-    background: #0ea5e9;
+.dot-indicator {
+    width: 6px;
+    height: 6px;
+    background: #10b981;
     border-radius: 50%;
-    box-shadow: 0 0 10px #38bdf8;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.7);
 }
 
-/* Forms & Interactive Elements */
+/* Input Fields */
 .stTextArea textarea {
-    background-color: rgba(9, 18, 30, 0.85) !important;
+    background-color: #0e1117 !important;
     color: #f8fafc !important;
-    border: 1px solid rgba(56, 189, 248, 0.24) !important;
+    border: 1px solid var(--border-subtle) !important;
     border-radius: 12px !important;
-    font-size: 14px !important;
+    font-size: 13.5px !important;
+    padding: 12px !important;
 }
 
 .stTextArea textarea:focus {
-    border-color: #38bdf8 !important;
-    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15) !important;
 }
 
 .stSelectbox div[data-baseweb="select"] > div {
-    background-color: rgba(9, 18, 30, 0.85) !important;
-    border: 1px solid rgba(56, 189, 248, 0.24) !important;
+    background-color: #0e1117 !important;
+    border: 1px solid var(--border-subtle) !important;
     border-radius: 12px !important;
     color: #f8fafc !important;
+    min-height: 42px !important;
 }
 
 div.stButton > button {
-    background: linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #0ea5e9 100%) !important;
+    background: linear-gradient(180deg, #2b3340 0%, #1c222c 100%) !important;
     color: #ffffff !important;
-    font-weight: 700 !important;
-    font-size: 14px !important;
-    letter-spacing: 0.05em !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    font-weight: 600 !important;
+    font-size: 13.5px !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
     border-radius: 12px !important;
-    padding: 0.72rem 1.6rem !important;
-    box-shadow: 0 4px 22px rgba(14, 165, 233, 0.35) !important;
-    transition: all 0.25s ease !important;
+    padding: 0.65rem 1.2rem !important;
+    min-height: 42px !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4) !important;
 }
 
 div.stButton > button:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 28px rgba(56, 189, 248, 0.55) !important;
+    background: linear-gradient(180deg, #374152 0%, #252e3c 100%) !important;
+    border-color: rgba(255, 255, 255, 0.28) !important;
 }
 
-.tag-badge {
-    background: rgba(14, 165, 233, 0.15);
-    color: #7dd3fc;
-    border: 1px solid rgba(56, 189, 248, 0.28);
-    border-radius: 6px;
-    padding: 4px 10px;
+/* Metric Display System */
+.metric-tile {
+    background: #0d1016;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 14px 16px;
+}
+
+.metric-label {
     font-size: 11px;
     font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+}
+
+.metric-value-lg {
+    font-size: 22px;
+    font-weight: 800;
+    color: #ffffff;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.badge-tag {
+    background: rgba(255, 255, 255, 0.05);
+    color: #cbd5e1;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.effort-indicator {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: rgba(56, 189, 248, 0.1);
+    color: #7dd3fc;
+    border: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.balance-track {
+    width: 100%;
+    height: 8px;
+    background: #171c26;
+    border-radius: 9999px;
+    overflow: hidden;
+    display: flex;
+    margin-top: 14px;
+}
+
+.balance-fill-left {
+    background: linear-gradient(90deg, #475569, #cbd5e1);
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.balance-fill-right {
+    background: #1e293b;
+    height: 100%;
+    transition: width 0.3s ease;
 }
 </style>""", unsafe_allow_html=True)
 
-# Custom SVG Brand Logo for NIVO (Geometric Water-Level Balance Balance Concept)
-LOGO_SVG = """<svg width="42" height="42" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+# Custom High-End NIVO Precision Level Logo (SVG)
+NIVO_LOGO_SVG = """<svg width="42" height="42" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="nivo_blue" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#bae6fd" />
-      <stop offset="45%" stop-color="#0ea5e9" />
-      <stop offset="100%" stop-color="#0369a1" />
+    <radialGradient id="nivoBg" cx="50%" cy="20%" r="90%">
+      <stop offset="0%" stop-color="#1e2430"/>
+      <stop offset="100%" stop-color="#0e1218"/>
+    </radialGradient>
+    <linearGradient id="nivoBorder" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#475569" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#334155" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#1e293b" stop-opacity="0.8"/>
     </linearGradient>
-    <linearGradient id="glow_grad" x1="0" y1="0" x2="48" y2="0" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#0284c7" stop-opacity="0.3"/>
-      <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.9"/>
-      <stop offset="100%" stop-color="#0284c7" stop-opacity="0.3"/>
+    <linearGradient id="nivoGleam" x1="12" y1="12" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="60%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+    <linearGradient id="levelBeam" x1="12" y1="37" x2="36" y2="37" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.2"/>
+      <stop offset="50%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.2"/>
     </linearGradient>
   </defs>
-  <rect width="48" height="48" rx="14" fill="#081423"/>
-  <rect x="0.75" y="0.75" width="46.5" height="46.5" rx="13.25" stroke="url(#nivo_blue)" stroke-opacity="0.45"/>
-  <path d="M14 34V14L24 28L34 14V34" stroke="url(#nivo_blue)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <line x1="12" y1="38" x2="36" y2="38" stroke="url(#glow_grad)" stroke-width="2.5" stroke-linecap="round"/>
-  <circle cx="24" cy="38" r="2.2" fill="#38bdf8"/>
+  <rect width="48" height="48" rx="13" fill="url(#nivoBg)"/>
+  <rect x="0.75" y="0.75" width="46.5" height="46.5" rx="12.25" stroke="url(#nivoBorder)" stroke-width="1.5"/>
+  <path d="M15 32V16L24 27.5L33 16V32" stroke="url(#nivoGleam)" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="13" y1="37" x2="35" y2="37" stroke="url(#levelBeam)" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="24" cy="37" r="2.2" fill="#38bdf8"/>
+  <circle cx="24" cy="37" r="0.9" fill="#ffffff"/>
 </svg>"""
 
-navbar_html = f"""<div class="nav-container">
-<div class="brand-wrapper">
-{LOGO_SVG}
+navbar_html = f"""<div class="nav-shell">
+<div class="brand-combo">
+{NIVO_LOGO_SVG}
 <div>
-<div class="brand-name">NIVO</div>
-<div style="font-size: 10px; color: #7dd3fc; letter-spacing: 0.12em; text-transform: uppercase;">Cognitive Balance Operating System</div>
+<div class="brand-text-nivo">NIVO</div>
+<div class="brand-subline">Cognitive Balance Operating System</div>
 </div>
 </div>
-<div class="status-badge"><span class="status-pulse"></span> Privacy Core Online</div>
+<div class="badge-pill"><span class="dot-indicator"></span> E2EE Active</div>
 </div>"""
 
 st.markdown(navbar_html, unsafe_allow_html=True)
 
-# State initialization
+# Initial Extended Task State
 if "tasks" not in st.session_state:
     st.session_state.tasks = [
-        {"title": "Eczane ve İlaç Temini", "due": "Yarın 10:00", "owner": "Buse", "tag": "Lojistik"},
-        {"title": "Mutfak Derin Temizlik", "due": "Bugün 20:00", "owner": "Hakan", "tag": "Ev Düzeni"},
-        {"title": "Aylık Kira & Fatura Masrafları", "due": "15 Ekim", "owner": "Hakan", "tag": "Finans"}
+        {"id": 1, "title": "Kedinin Aşı Takvimi & Veteriner Randevusu", "due": "Salı 14:00", "owner": "Buse", "tag": "Evcil Hayvan", "weight": 3},
+        {"id": 2, "title": "Yıllık Ev & Araç Sigorta Karşılaştırması", "due": "18 Ekim", "owner": "Hakan", "tag": "Finans", "weight": 3},
+        {"id": 3, "title": "Haftalık Sağlıklı Yemek & Market Planı", "due": "Bu Akşam", "owner": "Buse", "tag": "Lojistik", "weight": 2},
+        {"id": 4, "title": "Kombi Yıllık Bakımı ve Servis Araması", "due": "Cuma 11:00", "owner": "Hakan", "tag": "Ev Düzeni", "weight": 2},
+        {"id": 5, "title": "Mutfak Derin Hijyen ve Düzenleme", "due": "Hafta Sonu", "owner": "Hakan", "tag": "Ev Düzeni", "weight": 1},
     ]
 
-col_left, col_right = st.columns([1.18, 1], gap="large")
+col_left, col_right = st.columns([1.12, 1], gap="medium")
 
 with col_left:
     st.markdown("""<div class="nivo-card">
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-<div style="font-weight:700; font-size:16px; color:#f8fafc;">WhatsApp & Doğal Dil Akışı</div>
-<span style="font-size:11px; color:#38bdf8; font-family:monospace;">E2EE Neural Hook</span>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+<div style="font-weight:700; font-size:14px; color:#f1f5f9;">WhatsApp Doğal Dil Asistanı</div>
+<span style="font-size:10.5px; color:#94a3b8; font-family:'JetBrains Mono', monospace;">Zero-Retention Hook</span>
 </div>""", unsafe_allow_html=True)
 
     input_text = st.text_area(
         label="Mesaj İçeriği",
         label_visibility="collapsed",
-        placeholder="WhatsApp'tan bir mesaj girin: 'Buse yarın marketten kahve alabilir misin, ben de akşam evi toparlarım.'",
-        height=95
+        placeholder="WhatsApp mesajı yapıştırın: 'Buse yarın kedinin mamasını sipariş edebilir misin, ben de kombi servisini ararım.'",
+        height=85
     )
 
     c_in1, c_in2 = st.columns([1, 1])
     with c_in1:
-        actor = st.selectbox("Mesajı İleten:", ["Hakan", "Buse"], label_visibility="collapsed")
+        actor = st.selectbox("Mesaj Sahibi:", ["Hakan", "Buse"], label_visibility="collapsed")
     with c_in2:
         sync_btn = st.button("Senkronize Et ⚡", use_container_width=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
 
+    # Dynamic Parsing Engine
     if sync_btn and input_text.strip():
         raw_lower = input_text.lower()
         detected_task = "Rutin Koordinasyon"
-        time_window = "En Kısa Sürede"
+        time_window = "Yakında"
         category = "Genel"
+        task_weight = 1
 
-        if any(w in raw_lower for w in ["veteriner", "kedi", "mama", "köpek"]):
-            detected_task = "Kedi & Veteriner İhtiyaçları"
+        if any(w in raw_lower for w in ["veteriner", "kedi", "mama", "köpek", "aşı"]):
+            detected_task = "Evcil Hayvan Sağlık & Tedarik"
             category = "Evcil Hayvan"
-        elif any(w in raw_lower for w in ["eczane", "ilaç", "sağlık", "doktor"]):
-            detected_task = "Eczane & Sağlık Temini"
+            task_weight = 3
+        elif any(w in raw_lower for w in ["eczane", "ilaç", "doktor", "hastane", "sağlık"]):
+            detected_task = "Sağlık & Eczane İhtiyaçları"
             category = "Sağlık"
-        elif any(w in raw_lower for w in ["market", "kahve", "ekmek", "süt", "sipariş"]):
-            detected_task = "Haftalık Market Tedariği"
-            category = "Lojistik"
-        elif any(w in raw_lower for w in ["fatura", "kira", "ödeme", "kart"]):
-            detected_task = "Bütçe ve Fatura Denkleştirme"
+            task_weight = 2
+        elif any(w in raw_lower for w in ["fatura", "kira", "sigorta", "bütçe", "kredi", "vergi"]):
+            detected_task = "Mali Yönetim & Fatura Denkleştirme"
             category = "Finans"
-        elif any(w in raw_lower for w in ["temizlik", "mutfak", "çöp", "bulaşık", "süpür"]):
-            detected_task = "Ev Organizasyonu & Hijyen"
+            task_weight = 3
+        elif any(w in raw_lower for w in ["market", "kahve", "sipariş", "yemek", "manav"]):
+            detected_task = "Mutfak & Market Lojistiği"
+            category = "Lojistik"
+            task_weight = 2
+        elif any(w in raw_lower for w in ["temizlik", "kombi", "servis", "tamir", "çöp", "bulaşık"]):
+            detected_task = "Ev Bakımı & Düzenleme"
             category = "Ev Düzeni"
+            task_weight = 2
         else:
             detected_task = input_text[:38].strip() + "..."
 
@@ -244,65 +344,97 @@ with col_left:
         elif "hafta sonu" in raw_lower:
             time_window = "Hafta Sonu"
 
+        new_id = max([t["id"] for t in st.session_state.tasks], default=0) + 1
         st.session_state.tasks.insert(0, {
+            "id": new_id,
             "title": detected_task,
             "due": time_window,
             "owner": actor,
-            "tag": category
+            "tag": category,
+            "weight": task_weight
         })
         st.rerun()
 
-    st.markdown("### 📋 Aktif Zihinsel Envanter")
-    for t in st.session_state.tasks:
-        card_markup = f"""<div class="nivo-card" style="padding:16px 20px; margin-bottom:12px;">
-<div style="display:flex; justify-content:space-between; align-items:flex-start;">
+    # Active Inventory & Interactive Completion
+    st.markdown("<div style='font-size:14px; font-weight:700; color:#cbd5e1; margin: 16px 0 10px 4px;'>📋 Aktif Zihinsel Envanter</div>", unsafe_allow_html=True)
+    
+    if st.session_state.tasks:
+        for t in list(st.session_state.tasks):
+            t_col1, t_col2 = st.columns([5.2, 1])
+            with t_col1:
+                weight_stars = "⚡" * t.get("weight", 1)
+                task_html = f"""<div class="nivo-card" style="padding:14px 16px; margin-bottom:6px;">
+<div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
 <div>
-<div style="font-weight:600; font-size:15px; color:#f8fafc; margin-bottom:6px;">{t['title']}</div>
-<div style="font-size:12px; color:#94a3b8;">⏱️ {t['due']} &nbsp;•&nbsp; 👤 <b>{t['owner']}</b></div>
+<div style="font-weight:600; font-size:13.5px; color:#f8fafc; margin-bottom:4px;">{t['title']}</div>
+<div style="font-size:11.5px; color:#94a3b8;">⏱️ {t['due']} &nbsp;•&nbsp; 👤 <b>{t['owner']}</b></div>
 </div>
-<span class="tag-badge">{t['tag']}</span>
+<div style="display:flex; gap:6px; align-items:center;">
+<span class="effort-indicator" title="Bilişsel Efor Derecesi">{weight_stars}</span>
+<span class="badge-tag">{t['tag']}</span>
+</div>
 </div>
 </div>"""
-        st.markdown(card_markup, unsafe_allow_html=True)
+                st.markdown(task_html, unsafe_allow_html=True)
+            with t_col2:
+                if st.button("Tamam", key=f"done_{t['id']}", help="Görevi tamamlandı olarak işaretle"):
+                    st.session_state.tasks = [task for task in st.session_state.tasks if task["id"] != t["id"]]
+                    st.rerun()
+    else:
+        st.info("Harika! Tüm zihinsel yük tamamlandı, aktif görev yok.")
 
 with col_right:
-    st.markdown("### ⚖️ Yük Denge Analitiği")
+    st.markdown("<div style='font-size:14px; font-weight:700; color:#cbd5e1; margin: 0 0 10px 4px;'>⚖️ Bilişsel Yük Analitiği</div>", unsafe_allow_html=True)
 
-    total_tasks = len(st.session_state.tasks)
-    hakan_tasks = sum(1 for t in st.session_state.tasks if t["owner"] == "Hakan")
-    buse_tasks = sum(1 for t in st.session_state.tasks if t["owner"] == "Buse")
+    # Weighted Load Calculations
+    hakan_weight = sum(t.get("weight", 1) for t in st.session_state.tasks if t["owner"] == "Hakan")
+    buse_weight = sum(t.get("weight", 1) for t in st.session_state.tasks if t["owner"] == "Buse")
+    total_weight = hakan_weight + buse_weight
 
-    hakan_ratio = round((hakan_tasks / total_tasks * 100)) if total_tasks > 0 else 50
-    buse_ratio = 100 - hakan_ratio if total_tasks > 0 else 50
+    hakan_ratio = round((hakan_weight / total_weight * 100)) if total_weight > 0 else 50
+    buse_ratio = 100 - hakan_ratio if total_weight > 0 else 50
 
-    st.markdown("""<div class="nivo-card">
-<div style="font-size:12px; font-weight:700; color:#38bdf8; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:16px;">
+    card_analytics = f"""<div class="nivo-card">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+<div style="font-size:11px; font-weight:700; color:#94a3b8; letter-spacing:0.08em; text-transform:uppercase;">
 Bilişsel Efor İndeksi (Nivo Skoru)
-</div>""", unsafe_allow_html=True)
-
-    m1, m2 = st.columns(2)
-    with m1:
-        st.metric(label="Hakan Sorumluluğu", value=f"%{hakan_ratio}", delta=f"{hakan_tasks} aktif görev")
-    with m2:
-        st.metric(label="Buse Sorumluluğu", value=f"%{buse_ratio}", delta=f"{buse_tasks} aktif görev")
-
-    st.progress(hakan_ratio / 100)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    status_text = (
-        "Sistem şu anda dengeli bir bilişsel iş yükü dağılımı öngörüyor. İki tarafın sorumlulukları senkronize ilerliyor."
-        if abs(hakan_ratio - buse_ratio) <= 15
-        else "Zihinsel yük dağılımında sapma tespit edildi. Yeni görevlerin dengelenmesi önerilir."
-    )
-
-    info_card = f"""<div class="nivo-card">
-<div style="font-size:13px; font-weight:700; color:#f8fafc; margin-bottom:8px;">Haftalık Görünmez Yük Dengesi</div>
-<div style="font-size:13px; color:#94a3b8; line-height:1.6;">{status_text}</div>
+</div>
+<span style="font-size:10px; color:#64748b; font-family:'JetBrains Mono';">Ağırlıklı Puan</span>
+</div>
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+<div class="metric-tile">
+<div class="metric-label">Hakan Efor Yükü</div>
+<div class="metric-value-lg">%{hakan_ratio} <span style="font-size:11.5px; color:#64748b; font-weight:500;">({hakan_weight} pts)</span></div>
+</div>
+<div class="metric-tile">
+<div class="metric-label">Buse Efor Yükü</div>
+<div class="metric-value-lg">%{buse_ratio} <span style="font-size:11.5px; color:#64748b; font-weight:500;">({buse_weight} pts)</span></div>
+</div>
+</div>
+<div class="balance-track">
+<div class="balance-fill-left" style="width:{hakan_ratio}%;"></div>
+<div class="balance-fill-right" style="width:{buse_ratio}%;"></div>
+</div>
 </div>"""
-    st.markdown(info_card, unsafe_allow_html=True)
-    
-    privacy_card = """<div class="nivo-card" style="border-color: rgba(56, 189, 248, 0.15);">
-<div style="font-size:12px; font-weight:700; color:#7dd3fc; margin-bottom:6px;">🛡️ Sıfır Konuşma Saklama Protokolü</div>
-<div style="font-size:12px; color:#64748b; line-height:1.5;">WhatsApp üzerinden iletilen mesajlar anlık JSON dönüşümünün ardından silinir; veri tabanında ham sohbet içeriği saklanmaz.</div>
+    st.markdown(card_analytics, unsafe_allow_html=True)
+
+    # Intelligent Balance Engine Recommendation
+    if abs(hakan_ratio - buse_ratio) <= 15:
+        recommendation = "✅ **Denge Optimize:** Zihinsel efor iki taraf arasında eşit dağılmış durumda. İletişim akışı pürüzsüz."
+    elif hakan_ratio > buse_ratio:
+        recommendation = "💡 **Denge Önerisi:** Hakan üzerinde finans ve servis takibi kaynaklı yoğun bir bilişsel yük var. Sonraki operasyonel işleri Buse'nin devralması önerilir."
+    else:
+        recommendation = "💡 **Denge Önerisi:** Buse üzerinde evcil hayvan ve rutin planlama sorumluluğu birikmiş durumda. Sıradaki lojistik görevleri Hakan'ın üstlenmesi dengeyi korur."
+
+    recommendation_card = f"""<div class="nivo-card">
+<div style="font-size:12.5px; font-weight:700; color:#f8fafc; margin-bottom:6px;">Akıllı Dengeleme Tavsiyesi</div>
+<div style="font-size:12px; color:#cbd5e1; line-height:1.5;">{recommendation}</div>
 </div>"""
-    st.markdown(privacy_card, unsafe_allow_html=True)
+    st.markdown(recommendation_card, unsafe_allow_html=True)
+
+    # Zero-Retention Privacy Module
+    protocol_card = """<div class="nivo-card" style="border-style:dashed;">
+<div style="font-size:11.5px; font-weight:700; color:#cbd5e1; margin-bottom:4px;">🛡️ Sıfır Konuşma Saklama Protokolü</div>
+<div style="font-size:11px; color:#64748b; line-height:1.45;">WhatsApp üzerinden gelen ham sohbet girdileri işlendikten sonra doğrudan RAM üzerinden imha edilir. Gizlilik gereği sunucuda metin tutulmaz.</div>
+</div>"""
+    st.markdown(protocol_card, unsafe_allow_html=True)
