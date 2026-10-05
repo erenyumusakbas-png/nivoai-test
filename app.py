@@ -1,6 +1,8 @@
 import streamlit as st
 import random
 import time
+import json
+import os
 
 st.set_page_config(
     page_title="NIVO — Cognitive Balance OS",
@@ -80,99 +82,88 @@ div.stButton > button:hover { background-color: #2d3746 !important; border-color
 .progress-track { width: 100%; height: 8px; background: #101319; border-radius: 99px; overflow: hidden; display: flex; margin-top: 14px; border: 1px solid #27303f; }
 </style>""", unsafe_allow_html=True)
 
-# 15'ER ADETLİK GERÇEKÇİ SENARYO HAVUZU
+# SİMÜLASYON MESAJ HAVUZU
 STRESS_MSGS = [
     "Yine mutfak darmadağın kalmış, her akşam ben toplamaktan gerçekten çok yoruldum artık.",
     "Hep ben hatırlatıyorum, fatura son gün gelmiş yine, tek başıma yetişemiyorum.",
     "Sürekli marketi ben düşünüyorum, yine unutmuşsun. Her şeyi ben mi düşüneceğim?",
     "Çamaşırları asmayı yine unutmuşsun, makinede kokmuş hep bıktım ya.",
-    "Bıktım artık her şeyi arkandan toplamaktan, biraz inisiyatif al.",
-    "Sürekli ben plan yapıyorum, bir kere de sen bir haftasonu organize et.",
-    "Kedinin kumunu temizlememişsin yine, ev kokuyor çıldıracağım.",
-    "Kaç kere söyledim şu çöpleri at diye, duvarla konuşuyorum sanki.",
-    "Yine aynı konu, banyoyu sırılsıklam bırakmışsın yoruldum artık.",
-    "Bütün evin yükü benim omzumda, tek başıma bu evi nasıl çevireyim?",
-    "Sosyal medya postlarını bile ben hatırlatıyorum, hep benim üzerimde yük.",
-    "Sürekli kendi işlerine odaklanıyorsun, evin hali umrunda değil.",
-    "Hep erteliyorsun, son dakika paniğini ben çekiyorum bıktım.",
-    "Sana sabah al dediğim ilaçları yine unutmuşsun, sinirlerim bozuldu.",
-    "Buzdolabı bomboş, akşama ne yiyeceğiz diye yine sadece ben stres oluyorum."
+    "Bıktım artık her şeyi arkandan toplamaktan, biraz inisiyatif al."
 ]
-
 CRISIS_MSGS = [
     "Acil usta bulman lazım, banyoyu su bastı!",
     "Kombi yine E03 hatası veriyor, donduk evde hemen yetkili servisi ara.",
     "Kedinin midesi bozuldu çok kusuyor, acil veterineri ara randevu al.",
     "Araba çalışmıyor, çekici çağırsana acil geç kaldım.",
-    "Elektrikler gitti sunumum var, acil müşteri hizmetlerini ara.",
-    "Kapıda kaldım anahtarımı içeride unutmuşum, hemen çilingir bul.",
-    "Lastik patladı otobanın kenarındayım, acil yol yardımı ara.",
-    "Buzdolabının altından sular akıyor, acil servis çağır!",
-    "Ev sahibi arıyor kirayı yatırmamışız, hemen hallet şunu acil.",
-    "Cüzdanımı düşürmüşüm kartlar gitti, acil bankayı ara iptal et.",
-    "İnternet koptu, acil mail atmam lazım acil destek ara!",
-    "Arabaya birisi çarpmış kaçmış, acil kaskoyu ara kayıt açtır.",
-    "Hesabımız hacklenmiş gibi duruyor, şifreleri acil sıfırla!",
-    "Çatı akıtıyor, salona su damlıyor acil gelmen lazım.",
-    "Fırından dumanlar çıkıyor şalter attı, acil elektrikçi bul."
+    "Elektrikler gitti sunumum var, acil müşteri hizmetlerini ara."
 ]
-
 STANDARD_MSGS = [
     "Akşam gelirken marketten 2 ekmekle yoğurt alır mısın?",
     "Elektrik faturası gelmiş, sana zahmet akşam yatırır mısın?",
     "Haftasonu annemlere gideceğiz, planını ona göre yap lütfen.",
     "Kedinin maması bitmiş, internetten sipariş geçer misin?",
-    "Lensin iadesi var, yarın kargoya verebilir misin?",
-    "Oyunun güncellemesi gelmiş galiba, akşam girmeden kontrol eder misin?",
-    "Instagram reels postunu bugün atacak mısın, hatırlatayım dedim.",
-    "Projeyi render alacaktım, bilgisayarı açık bırakır mısın?",
-    "Akşama makarna yapacağım, gelirken krema ve mantar alır mısın?",
-    "Kombinin basıncı düşmüş, gelince su basar mısın?",
-    "Yarın sabah erken çıkacağım, kedinin kahvaltısını sen verir misin?",
-    "DASK poliçe süresi dolmuş, yenileme fiyatlarına bakar mısın?",
-    "Kuru temizlemeden ceketleri almayı unutma gelirken.",
-    "Balkondaki saksıları akşam sular mısın toprakları kurumuş.",
-    "Hafta sonu sinemaya gidelim mi, yeni bir gerilim filmi çıkmış."
+    "Akşama makarna yapacağım, gelirken krema ve mantar alır mısın?"
 ]
 
-# Üst Bar & Versiyon Etiketi
+# KALICI HAFIZA (JSON VERİTABANI YÖNETİMİ)
+DATA_FILE = "nivo_tasks.json"
+
+DEFAULT_TASKS = [
+    {"id": 1, "title": "Kedinin aşı takvimi ve veteriner randevusu", "due": "Bugün", "assigner": "Hakan", "owner": "Buse", "tag": "Evcil Hayvan", "weight": 3, "kind": "Zihinsel", "est": "45 Dk", "sync": True, "alert": ""},
+    {"id": 2, "title": "Bütün evin detaylı toparlanması ve temizliği", "due": "Bugün", "assigner": "Hakan", "owner": "Buse", "tag": "Ev Düzeni", "weight": 2, "kind": "Fiziksel", "est": "2 Saat", "sync": False, "alert": "⚠️ Pasif-agresif kalıp: 'yoruldum'"},
+    {"id": 3, "title": "Kira ve elektrik faturasının son gün ödemesi", "due": "Yarın", "assigner": "Hakan", "owner": "Buse", "tag": "Finans", "weight": 3, "kind": "Zihinsel", "est": "30 Dk", "sync": True, "alert": ""},
+    {"id": 4, "title": "Haftalık mutfak alışverişi ve yemek planlaması", "due": "Bu Akşam", "assigner": "Hakan", "owner": "Buse", "tag": "Lojistik", "weight": 2, "kind": "Zihinsel", "est": "1 Saat", "sync": True, "alert": ""},
+    {"id": 5, "title": "Instagram reels post planlaması", "due": "Yarın", "assigner": "Hakan", "owner": "Buse", "tag": "Sosyal Medya", "weight": 3, "kind": "Zihinsel", "est": "1.5 Saat", "sync": True, "alert": ""},
+    {"id": 6, "title": "Bozuk kombi için acil yetkili servis aranması", "due": "Bugün", "assigner": "Hakan", "owner": "Buse", "tag": "Ev Düzeni", "weight": 3, "kind": "Zihinsel", "est": "Öncelikli", "sync": True, "alert": "🚨 Kriz Uyarı: 'acil'"},
+    {"id": 7, "title": "Çamaşırların yıkanıp akşamında ütülenmesi", "due": "Yarın", "assigner": "Hakan", "owner": "Buse", "tag": "Ev Düzeni", "weight": 2, "kind": "Fiziksel", "est": "1 Saat", "sync": False, "alert": ""},
+    {"id": 8, "title": "Misafirler için hafta sonu yemeği organizasyonu", "due": "Hafta Sonu", "assigner": "Hakan", "owner": "Buse", "tag": "Genel", "weight": 3, "kind": "Zihinsel", "est": "1 Saat", "sync": True, "alert": ""},
+    {"id": 9, "title": "Eczaneden biten günlük ilaçların tedariği", "due": "Bu Akşam", "assigner": "Hakan", "owner": "Buse", "tag": "Lojistik", "weight": 1, "kind": "Fiziksel", "est": "15 Dk", "sync": False, "alert": ""},
+    {"id": 10, "title": "YouTube senaryo taslağının bitirilmesi", "due": "Yakında", "assigner": "Hakan", "owner": "Buse", "tag": "Prodüksiyon", "weight": 3, "kind": "Zihinsel", "est": "2 Saat", "sync": True, "alert": ""},
+    {"id": 11, "title": "Oyun dosyalarının Steam'den doğrulanıp güncellenmesi", "due": "Bugün", "assigner": "Buse", "owner": "Hakan", "tag": "Ev Düzeni", "weight": 1, "kind": "Fiziksel", "est": "15 Dk", "sync": False, "alert": ""},
+    {"id": 12, "title": "Ekipmanların kargoya teslim edilmesi", "due": "Yarın", "assigner": "Buse", "owner": "Hakan", "tag": "Lojistik", "weight": 2, "kind": "Fiziksel", "est": "45 Dk", "sync": True, "alert": ""},
+]
+
+def load_tasks():
+    if os.path.exists(DATA_FILE):
+        try:
+            with open(DATA_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except:
+            return DEFAULT_TASKS.copy()
+    else:
+        # İlk açılışta dosyayı oluştur
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(DEFAULT_TASKS, f, ensure_ascii=False, indent=4)
+        return DEFAULT_TASKS.copy()
+
+def save_tasks(tasks):
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(tasks, f, ensure_ascii=False, indent=4)
+
+# Uygulama başlarken veritabanından oku
+if "tasks_v16" not in st.session_state:
+    st.session_state.tasks_v16 = load_tasks()
+
+if "sample_v16" not in st.session_state: st.session_state.sample_v16 = ""
+if "ai_msg_v16" not in st.session_state: st.session_state.ai_msg_v16 = None
+
+# ÜST BAR
 head_col1, head_col2, head_col3 = st.columns([0.65, 5, 2.5])
 with head_col1: st.image(LOGO_SVG, width=46)
 with head_col2:
     st.markdown("""<div style="display:flex; flex-direction:column; justify-content:center; height:46px;">
 <div style="font-size:22px; font-weight:800; letter-spacing:0.18em; color:#ffffff; line-height:1;">
-NIVO <span style="font-size:11px; font-weight:700; color:#38bdf8; letter-spacing:0.05em; vertical-align:middle; margin-left:6px; background:rgba(56, 189, 248, 0.1); padding:2px 6px; border-radius:4px;">v15.0 TITANIUM</span>
+NIVO <span style="font-size:11px; font-weight:700; color:#10b981; letter-spacing:0.05em; vertical-align:middle; margin-left:6px; background:rgba(16, 185, 129, 0.1); padding:2px 6px; border-radius:4px;">v16.0 PERSISTENT</span>
 </div>
 <div style="font-size:9.5px; color:#8b9bb4; letter-spacing:0.08em; text-transform:uppercase; font-weight:600; margin-top:3px;">Cognitive Balance Operating System</div>
 </div>""", unsafe_allow_html=True)
 with head_col3:
     st.markdown("""<div style="display:flex; justify-content:flex-end; align-items:center; height:46px; gap:8px;">
 <div style="background:#171b22; border:1px solid #27303f; color:#94a3b8; padding:5px 10px; border-radius:99px; font-size:11px; font-weight:600; display:flex; align-items:center; gap:6px;"><span style="width:6px; height:6px; background:#f59e0b; border-radius:50%;"></span> Streak: 12 Gün</div>
-<div style="background:#171b22; border:1px solid #27303f; color:#94a3b8; padding:5px 10px; border-radius:99px; font-size:11px; font-weight:600; display:flex; align-items:center; gap:6px;"><span style="width:6px; height:6px; background:#10b981; border-radius:50%;"></span> AI Core Online</div>
+<div style="background:#171b22; border:1px solid #27303f; color:#94a3b8; padding:5px 10px; border-radius:99px; font-size:11px; font-weight:600; display:flex; align-items:center; gap:6px;"><span style="width:6px; height:6px; background:#10b981; border-radius:50%;"></span> DB Online</div>
 </div>""", unsafe_allow_html=True)
 
 st.write("")
-
-# v15.0 - TAMAMEN YENİ STATE (Önbelleği kırmak için ismi değişti)
-if "tasks_v15" not in st.session_state:
-    st.session_state.tasks_v15 = [
-        {"id": 1, "title": "Kedinin aşı takvimi ve veteriner randevusu", "due": "Bugün", "assigner": "Hakan", "owner": "Buse", "tag": "Evcil Hayvan", "weight": 3, "kind": "Zihinsel", "est": "45 Dk", "sync": True, "alert": ""},
-        {"id": 2, "title": "Bütün evin detaylı toparlanması ve temizliği", "due": "Bugün", "assigner": "Hakan", "owner": "Buse", "tag": "Ev Düzeni", "weight": 2, "kind": "Fiziksel", "est": "2 Saat", "sync": False, "alert": "⚠️ Pasif-agresif kalıp: 'yoruldum'"},
-        {"id": 3, "title": "Kira ve elektrik faturasının son gün ödemesi", "due": "Yarın", "assigner": "Hakan", "owner": "Buse", "tag": "Finans", "weight": 3, "kind": "Zihinsel", "est": "30 Dk", "sync": True, "alert": ""},
-        {"id": 4, "title": "Haftalık mutfak alışverişi ve yemek planlaması", "due": "Bu Akşam", "assigner": "Hakan", "owner": "Buse", "tag": "Lojistik", "weight": 2, "kind": "Zihinsel", "est": "1 Saat", "sync": True, "alert": ""},
-        {"id": 5, "title": "Instagram reels post planlaması", "due": "Yarın", "assigner": "Hakan", "owner": "Buse", "tag": "Sosyal Medya", "weight": 3, "kind": "Zihinsel", "est": "1.5 Saat", "sync": True, "alert": ""},
-        {"id": 6, "title": "Bozuk kombi için acil yetkili servis aranması", "due": "Bugün", "assigner": "Hakan", "owner": "Buse", "tag": "Ev Düzeni", "weight": 3, "kind": "Zihinsel", "est": "Öncelikli", "sync": True, "alert": "🚨 Kriz Uyarı: 'acil'"},
-        {"id": 7, "title": "Çamaşırların yıkanıp akşamında ütülenmesi", "due": "Yarın", "assigner": "Hakan", "owner": "Buse", "tag": "Ev Düzeni", "weight": 2, "kind": "Fiziksel", "est": "1 Saat", "sync": False, "alert": ""},
-        {"id": 8, "title": "Misafirler için hafta sonu yemeği organizasyonu", "due": "Hafta Sonu", "assigner": "Hakan", "owner": "Buse", "tag": "Genel", "weight": 3, "kind": "Zihinsel", "est": "1 Saat", "sync": True, "alert": ""},
-        {"id": 9, "title": "Eczaneden biten günlük ilaçların tedariği", "due": "Bu Akşam", "assigner": "Hakan", "owner": "Buse", "tag": "Lojistik", "weight": 1, "kind": "Fiziksel", "est": "15 Dk", "sync": False, "alert": ""},
-        {"id": 10, "title": "YouTube senaryo taslağının bitirilmesi", "due": "Yakında", "assigner": "Hakan", "owner": "Buse", "tag": "Prodüksiyon", "weight": 3, "kind": "Zihinsel", "est": "2 Saat", "sync": True, "alert": ""},
-        
-        {"id": 11, "title": "Oyun dosyalarının Steam'den doğrulanıp güncellenmesi", "due": "Bugün", "assigner": "Buse", "owner": "Hakan", "tag": "Ev Düzeni", "weight": 1, "kind": "Fiziksel", "est": "15 Dk", "sync": False, "alert": ""},
-        {"id": 12, "title": "Ekipmanların kargoya teslim edilmesi", "due": "Yarın", "assigner": "Buse", "owner": "Hakan", "tag": "Lojistik", "weight": 2, "kind": "Fiziksel", "est": "45 Dk", "sync": True, "alert": ""},
-    ]
-
-if "sample_v15" not in st.session_state: st.session_state.sample_v15 = ""
-if "ai_msg_v15" not in st.session_state: st.session_state.ai_msg_v15 = None
 
 def extract_task_summary(text):
     stopwords = ["buse", "hakan", "lütfen", "rica etsem", "misin", "mısın", "musun", "müsün", "ya", "bi", "sana zahmet", "acaba", "?", "!"]
@@ -190,24 +181,24 @@ with tab1:
         st.markdown("""<div class="nivo-card">
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
 <div style="font-weight:600; font-size:13.5px; color:#f8fafc;">WhatsApp Delegasyon & NLP Motoru</div>
-<span style="font-size:10px; color:#64748b; font-family:monospace;">Engine v15.0</span>
+<span style="font-size:10px; color:#10b981; font-family:monospace;">Disk Storage Active</span>
 </div>""", unsafe_allow_html=True)
 
         c_s1, c_s2, c_s3 = st.columns(3)
         with c_s1:
             if st.button("🚨 Tükenmişlik Örneği", use_container_width=True):
-                st.session_state.sample_v15 = random.choice(STRESS_MSGS)
+                st.session_state.sample_v16 = random.choice(STRESS_MSGS)
                 st.rerun()
         with c_s2:
             if st.button("🔧 Rutin Kriz Örneği", use_container_width=True):
-                st.session_state.sample_v15 = random.choice(CRISIS_MSGS)
+                st.session_state.sample_v16 = random.choice(CRISIS_MSGS)
                 st.rerun()
         with c_s3:
             if st.button("🛒 Standart Örnek", use_container_width=True):
-                st.session_state.sample_v15 = random.choice(STANDARD_MSGS)
+                st.session_state.sample_v16 = random.choice(STANDARD_MSGS)
                 st.rerun()
 
-        input_text = st.text_area(label="Mesaj", label_visibility="collapsed", value=st.session_state.sample_v15, placeholder="Doğal bir mesaj girin...", height=85)
+        input_text = st.text_area(label="Mesaj", label_visibility="collapsed", value=st.session_state.sample_v16, placeholder="Doğal bir mesaj girin...", height=85)
 
         c1, c2, c3 = st.columns([1.5, 1, 1.2])
         with c1:
@@ -245,29 +236,32 @@ with tab1:
             elif any(k in txt for k in ["market", "kahve", "eczane", "ilaç", "ekmek", "su", "sipariş"]): category, w, kind, est_time = "Lojistik", max(2, w), "Fiziksel", "45 Dk"
             elif any(k in txt for k in ["usta", "servis", "kombi", "tamir", "çekici", "çilingir", "internet"]): category, w, kind, est_time = "Ev Düzeni", max(3, w), "Zihinsel", "1.5 Saat"
             elif any(k in txt for k in ["temizlik", "çöp", "bulaşık", "mutfak", "çamaşır"]): category, w, kind, est_time = "Ev Düzeni", max(2, w), "Fiziksel", "1 Saat"
-            elif any(k in txt for k in ["premiere", "export", "sosyal medya", "reels", "video", "kayıt"]): category, w, kind, est_time = "Prodüksiyon & Sosyal Medya", max(3, w), "Zihinsel", "2 Saat"
 
             due = "Bugün" if found_urgent else ("Yarın" if "yarın" in txt else ("Bu Akşam" if "akşam" in txt else "Yakında"))
             other_person = "Buse" if sender_actor == "Hakan" else "Hakan"
             
             assigned_owner = sender_actor if any(x in txt for x in ["ben ", " hallederim", " yaparım"]) else (other_person if is_stressed else other_person)
 
-            st.session_state.tasks_v15.insert(0, {
+            # Yeni görevi ekle
+            st.session_state.tasks_v16.insert(0, {
                 "id": random.randint(10000, 99999), "title": title, "due": due, "assigner": sender_actor,
                 "owner": assigned_owner, "tag": category, "weight": w, "kind": kind, "est": est_time,
                 "sync": do_sync, "alert": alert_msg
             })
-            st.session_state.sample_v15 = ""
-            st.session_state.ai_msg_v15 = None
+            # KALICI HAFIZAYA KAYDET
+            save_tasks(st.session_state.tasks_v16)
+            
+            st.session_state.sample_v16 = ""
+            st.session_state.ai_msg_v16 = None
             st.rerun()
 
-        if st.session_state.ai_msg_v15:
-            st.success(st.session_state.ai_msg_v15)
+        if st.session_state.ai_msg_v16:
+            st.success(st.session_state.ai_msg_v16)
 
-        st.markdown(f"<div style='font-size:12.5px; font-weight:700; color:#8b9bb4; margin:16px 0 8px 2px;'>📋 AKTİF ENVANTER ({len(st.session_state.tasks_v15)} GÖREV)</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='font-size:12.5px; font-weight:700; color:#8b9bb4; margin:16px 0 8px 2px;'>📋 AKTİF ENVANTER ({len(st.session_state.tasks_v16)} GÖREV)</div>", unsafe_allow_html=True)
 
-        if st.session_state.tasks_v15:
-            for idx, t in enumerate(list(st.session_state.tasks_v15)):
+        if st.session_state.tasks_v16:
+            for idx, t in enumerate(list(st.session_state.tasks_v16)):
                 col_t1, col_t2, col_t3 = st.columns([5.2, 1.2, 1.2])
                 with col_t1:
                     k_badge = f'<span class="badge-mental">🧠 {t["kind"]}</span>' if t["kind"] == "Zihinsel" else f'<span class="badge-phys">🛠️ {t["kind"]}</span>'
@@ -289,25 +283,34 @@ with tab1:
                 with col_t2:
                     other_person = "Buse" if t["owner"] == "Hakan" else "Hakan"
                     if st.button("Devret ⇄", key=f"swap_{t['id']}", help="Karşı tarafa aktar"):
-                        st.session_state.tasks_v15[idx]["owner"] = other_person
-                        st.session_state.tasks_v15[idx]["assigner"] = "Devredildi"
-                        st.session_state.ai_msg_v15 = None
+                        st.session_state.tasks_v16[idx]["owner"] = other_person
+                        st.session_state.tasks_v16[idx]["assigner"] = "Devredildi"
+                        st.session_state.ai_msg_v16 = None
+                        save_tasks(st.session_state.tasks_v16) # DEĞİŞİKLİĞİ KAYDET
                         st.rerun()
                 with col_t3:
                     if st.button("Bitir ✓", key=f"done_{t['id']}"):
-                        completed_task = st.session_state.tasks_v15.pop(idx)
-                        st.session_state.ai_msg_v15 = None
+                        completed_task = st.session_state.tasks_v16.pop(idx)
+                        st.session_state.ai_msg_v16 = None
+                        save_tasks(st.session_state.tasks_v16) # SİLME İŞLEMİNİ KAYDET
+                        
                         if completed_task["weight"] >= 3:
                             other_p = "Hakan" if completed_task["owner"] == "Buse" else "Buse"
                             st.toast(f"💌 Harika! {completed_task['owner']} ağır bir Zihinsel Yükü temizledi. NIVO: {other_p}, ona teşekkür etmek ister misin?", icon="🎉")
                         st.rerun()
         else:
             st.info("Harika, sistem dengede. Aktif görev bulunmuyor.")
+            
+        # Tüm görevleri sıfırlama butonu (Geliştirici için)
+        if st.button("🗑️ Veritabanını Sıfırla"):
+            st.session_state.tasks_v16 = DEFAULT_TASKS.copy()
+            save_tasks(st.session_state.tasks_v16)
+            st.rerun()
 
     with col_right:
-        total_tasks = len(st.session_state.tasks_v15)
-        h_weight = sum(t["weight"] for t in st.session_state.tasks_v15 if t["owner"] == "Hakan")
-        b_weight = sum(t["weight"] for t in st.session_state.tasks_v15 if t["owner"] == "Buse")
+        total_tasks = len(st.session_state.tasks_v16)
+        h_weight = sum(t["weight"] for t in st.session_state.tasks_v16 if t["owner"] == "Hakan")
+        b_weight = sum(t["weight"] for t in st.session_state.tasks_v16 if t["owner"] == "Buse")
         tot_weight = h_weight + b_weight
         h_ratio = round((h_weight / tot_weight * 100)) if tot_weight > 0 else 50
         b_ratio = 100 - h_ratio if tot_weight > 0 else 50
@@ -318,7 +321,7 @@ with tab1:
 
         st.markdown("<div style='font-size:12.5px; font-weight:700; color:#8b9bb4; margin:0 0 8px 2px;'>📊 GÜNLÜK KOKPİT & TAHMİN</div>", unsafe_allow_html=True)
         
-        today_tasks = sum(1 for t in st.session_state.tasks_v15 if t["due"] == "Bugün")
+        today_tasks = sum(1 for t in st.session_state.tasks_v16 if t["due"] == "Bugün")
         bottleneck_msg = f"⏳ **Kritik Darboğaz Uyarısı:** Bugün teslim edilecek {today_tasks} acil iş birikti. Akşam saatlerinde stres seviyesi zirve yapabilir." if today_tasks >= 3 else ("⏳ **Darboğaz Uyarısı:** Bugün teslim edilecek görevler birikiyor." if today_tasks > 1 else "✅ Yakın vadede zamanlama darboğazı görünmüyor.")
 
         if harmony_score == 100: briefing = f"🎉 **Mükemmel Denge!** İletişiminiz kusursuz, hiçbir müdahaleye gerek yok."
@@ -334,21 +337,21 @@ with tab1:
 <div style="font-size:11.5px; color:#ef4444; background:rgba(239, 68, 68, 0.08); padding:8px; border-radius:6px; border: 1px solid rgba(239, 68, 68, 0.2);">{bottleneck_msg}</div>
 </div>""", unsafe_allow_html=True)
 
-        if harmony_score < 70 and len(st.session_state.tasks_v15) > 1:
+        if harmony_score < 70 and len(st.session_state.tasks_v16) > 1:
             st.markdown("<div class='ai-balance-btn'>", unsafe_allow_html=True)
             if st.button("🤖 NIVO AI: Acil Yük Dengele", use_container_width=True):
                 overloaded = "Hakan" if h_weight > b_weight else "Buse"
                 underloaded = "Buse" if overloaded == "Hakan" else "Hakan"
                 target_shift = abs(h_weight - b_weight) / 2
                 
-                over_tasks = [t for t in st.session_state.tasks_v15 if t["owner"] == overloaded]
+                over_tasks = [t for t in st.session_state.tasks_v16 if t["owner"] == overloaded]
                 over_tasks.sort(key=lambda x: x["weight"], reverse=True) 
                 
                 shifted_weight = 0
                 moved_count = 0
                 for t in over_tasks:
                     if shifted_weight + t["weight"] <= target_shift + 1:
-                        for main_t in st.session_state.tasks_v15:
+                        for main_t in st.session_state.tasks_v16:
                             if main_t["id"] == t["id"]:
                                 main_t["owner"] = underloaded
                                 main_t["assigner"] = "NIVO AI"
@@ -357,15 +360,18 @@ with tab1:
                                 break
                     if shifted_weight >= target_shift: break
                 
-                if moved_count > 0: st.session_state.ai_msg_v15 = f"✅ NIVO AI, eşitsizliği gidermek için {moved_count} ağır görevi {overloaded}'dan alıp {underloaded}'a devretti! Harmony skoru yükseldi."
-                else: st.session_state.ai_msg_v15 = "Görev ağırlıkları bölüşüme izin vermiyor, kartlar üzerinden manuel devretmeniz önerilir."
+                if moved_count > 0: 
+                    st.session_state.ai_msg_v16 = f"✅ NIVO AI, eşitsizliği gidermek için {moved_count} ağır görevi {overloaded}'dan alıp {underloaded}'a devretti! Harmony skoru yükseldi."
+                    save_tasks(st.session_state.tasks_v16) # AI DENGELEMESİNİ KAYDET
+                else: 
+                    st.session_state.ai_msg_v16 = "Görev ağırlıkları bölüşüme izin vermiyor, kartlar üzerinden manuel devretmeniz önerilir."
                 st.rerun()
             st.markdown("</div>", unsafe_allow_html=True)
 
         st.markdown("<div style='font-size:12.5px; font-weight:700; color:#8b9bb4; margin:20px 0 8px 2px;'>⚖️ BİLİŞSEL EFOR İNDEKSİ</div>", unsafe_allow_html=True)
 
-        b_mental = sum(1 for t in st.session_state.tasks_v15 if t["owner"] == "Buse" and t["kind"] == "Zihinsel")
-        h_mental = sum(1 for t in st.session_state.tasks_v15 if t["owner"] == "Hakan" and t["kind"] == "Zihinsel")
+        b_mental = sum(1 for t in st.session_state.tasks_v16 if t["owner"] == "Buse" and t["kind"] == "Zihinsel")
+        h_mental = sum(1 for t in st.session_state.tasks_v16 if t["owner"] == "Hakan" and t["kind"] == "Zihinsel")
 
         st.markdown(f"""<div class="nivo-card">
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
@@ -390,7 +396,7 @@ with tab2:
     st.markdown("<div style='font-size:15px; font-weight:700; color:#f8fafc; margin:10px 0 20px 0;'>🔍 Kategori Bazlı Emek Analizi</div>", unsafe_allow_html=True)
     
     cats = {}
-    for t in st.session_state.tasks_v15:
+    for t in st.session_state.tasks_v16:
         c = t["tag"]
         if c not in cats: cats[c] = {"Hakan": 0, "Buse": 0}
         cats[c][t["owner"]] += t["weight"]
