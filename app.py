@@ -1,6 +1,5 @@
 import streamlit as st
 import random
-import time
 import json
 import os
 
@@ -105,8 +104,8 @@ STANDARD_MSGS = [
     "Akşama makarna yapacağım, gelirken krema ve mantar alır mısın?"
 ]
 
-# KALICI HAFIZA (JSON VERİTABANI YÖNETİMİ)
-DATA_FILE = "nivo_tasks.json"
+# v17.0 İÇİN YEPYENİ VERİTABANI DOSYASI
+DATA_FILE = "nivo_core_v17.json"
 
 DEFAULT_TASKS = [
     {"id": 1, "title": "Kedinin aşı takvimi ve veteriner randevusu", "due": "Bugün", "assigner": "Hakan", "owner": "Buse", "tag": "Evcil Hayvan", "weight": 3, "kind": "Zihinsel", "est": "45 Dk", "sync": True, "alert": ""},
@@ -119,6 +118,7 @@ DEFAULT_TASKS = [
     {"id": 8, "title": "Misafirler için hafta sonu yemeği organizasyonu", "due": "Hafta Sonu", "assigner": "Hakan", "owner": "Buse", "tag": "Genel", "weight": 3, "kind": "Zihinsel", "est": "1 Saat", "sync": True, "alert": ""},
     {"id": 9, "title": "Eczaneden biten günlük ilaçların tedariği", "due": "Bu Akşam", "assigner": "Hakan", "owner": "Buse", "tag": "Lojistik", "weight": 1, "kind": "Fiziksel", "est": "15 Dk", "sync": False, "alert": ""},
     {"id": 10, "title": "YouTube senaryo taslağının bitirilmesi", "due": "Yakında", "assigner": "Hakan", "owner": "Buse", "tag": "Prodüksiyon", "weight": 3, "kind": "Zihinsel", "est": "2 Saat", "sync": True, "alert": ""},
+    
     {"id": 11, "title": "Oyun dosyalarının Steam'den doğrulanıp güncellenmesi", "due": "Bugün", "assigner": "Buse", "owner": "Hakan", "tag": "Ev Düzeni", "weight": 1, "kind": "Fiziksel", "est": "15 Dk", "sync": False, "alert": ""},
     {"id": 12, "title": "Ekipmanların kargoya teslim edilmesi", "due": "Yarın", "assigner": "Buse", "owner": "Hakan", "tag": "Lojistik", "weight": 2, "kind": "Fiziksel", "est": "45 Dk", "sync": True, "alert": ""},
 ]
@@ -131,7 +131,6 @@ def load_tasks():
         except:
             return DEFAULT_TASKS.copy()
     else:
-        # İlk açılışta dosyayı oluştur
         with open(DATA_FILE, "w", encoding="utf-8") as f:
             json.dump(DEFAULT_TASKS, f, ensure_ascii=False, indent=4)
         return DEFAULT_TASKS.copy()
@@ -140,12 +139,10 @@ def save_tasks(tasks):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(tasks, f, ensure_ascii=False, indent=4)
 
-# Uygulama başlarken veritabanından oku
-if "tasks_v16" not in st.session_state:
-    st.session_state.tasks_v16 = load_tasks()
-
-if "sample_v16" not in st.session_state: st.session_state.sample_v16 = ""
-if "ai_msg_v16" not in st.session_state: st.session_state.ai_msg_v16 = None
+# YEPYENİ STATE İSİMLERİ İLE ESKİ HAFIZAYI SIFIRLADIK
+if "tasks_v17" not in st.session_state: st.session_state.tasks_v17 = load_tasks()
+if "sample_v17" not in st.session_state: st.session_state.sample_v17 = ""
+if "ai_msg_v17" not in st.session_state: st.session_state.ai_msg_v17 = None
 
 # ÜST BAR
 head_col1, head_col2, head_col3 = st.columns([0.65, 5, 2.5])
@@ -153,7 +150,7 @@ with head_col1: st.image(LOGO_SVG, width=46)
 with head_col2:
     st.markdown("""<div style="display:flex; flex-direction:column; justify-content:center; height:46px;">
 <div style="font-size:22px; font-weight:800; letter-spacing:0.18em; color:#ffffff; line-height:1;">
-NIVO <span style="font-size:11px; font-weight:700; color:#10b981; letter-spacing:0.05em; vertical-align:middle; margin-left:6px; background:rgba(16, 185, 129, 0.1); padding:2px 6px; border-radius:4px;">v16.0 PERSISTENT</span>
+NIVO <span style="font-size:11px; font-weight:700; color:#10b981; letter-spacing:0.05em; vertical-align:middle; margin-left:6px; background:rgba(16, 185, 129, 0.1); padding:2px 6px; border-radius:4px;">v17.0 LIVE</span>
 </div>
 <div style="font-size:9.5px; color:#8b9bb4; letter-spacing:0.08em; text-transform:uppercase; font-weight:600; margin-top:3px;">Cognitive Balance Operating System</div>
 </div>""", unsafe_allow_html=True)
@@ -187,18 +184,18 @@ with tab1:
         c_s1, c_s2, c_s3 = st.columns(3)
         with c_s1:
             if st.button("🚨 Tükenmişlik Örneği", use_container_width=True):
-                st.session_state.sample_v16 = random.choice(STRESS_MSGS)
+                st.session_state.sample_v17 = random.choice(STRESS_MSGS)
                 st.rerun()
         with c_s2:
             if st.button("🔧 Rutin Kriz Örneği", use_container_width=True):
-                st.session_state.sample_v16 = random.choice(CRISIS_MSGS)
+                st.session_state.sample_v17 = random.choice(CRISIS_MSGS)
                 st.rerun()
         with c_s3:
             if st.button("🛒 Standart Örnek", use_container_width=True):
-                st.session_state.sample_v16 = random.choice(STANDARD_MSGS)
+                st.session_state.sample_v17 = random.choice(STANDARD_MSGS)
                 st.rerun()
 
-        input_text = st.text_area(label="Mesaj", label_visibility="collapsed", value=st.session_state.sample_v16, placeholder="Doğal bir mesaj girin...", height=85)
+        input_text = st.text_area(label="Mesaj", label_visibility="collapsed", value=st.session_state.sample_v17, placeholder="Doğal bir mesaj girin...", height=85)
 
         c1, c2, c3 = st.columns([1.5, 1, 1.2])
         with c1:
@@ -242,26 +239,23 @@ with tab1:
             
             assigned_owner = sender_actor if any(x in txt for x in ["ben ", " hallederim", " yaparım"]) else (other_person if is_stressed else other_person)
 
-            # Yeni görevi ekle
-            st.session_state.tasks_v16.insert(0, {
+            st.session_state.tasks_v17.insert(0, {
                 "id": random.randint(10000, 99999), "title": title, "due": due, "assigner": sender_actor,
                 "owner": assigned_owner, "tag": category, "weight": w, "kind": kind, "est": est_time,
                 "sync": do_sync, "alert": alert_msg
             })
-            # KALICI HAFIZAYA KAYDET
-            save_tasks(st.session_state.tasks_v16)
-            
-            st.session_state.sample_v16 = ""
-            st.session_state.ai_msg_v16 = None
+            save_tasks(st.session_state.tasks_v17)
+            st.session_state.sample_v17 = ""
+            st.session_state.ai_msg_v17 = None
             st.rerun()
 
-        if st.session_state.ai_msg_v16:
-            st.success(st.session_state.ai_msg_v16)
+        if st.session_state.ai_msg_v17:
+            st.success(st.session_state.ai_msg_v17)
 
-        st.markdown(f"<div style='font-size:12.5px; font-weight:700; color:#8b9bb4; margin:16px 0 8px 2px;'>📋 AKTİF ENVANTER ({len(st.session_state.tasks_v16)} GÖREV)</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='font-size:12.5px; font-weight:700; color:#8b9bb4; margin:16px 0 8px 2px;'>📋 AKTİF ENVANTER ({len(st.session_state.tasks_v17)} GÖREV)</div>", unsafe_allow_html=True)
 
-        if st.session_state.tasks_v16:
-            for idx, t in enumerate(list(st.session_state.tasks_v16)):
+        if st.session_state.tasks_v17:
+            for idx, t in enumerate(list(st.session_state.tasks_v17)):
                 col_t1, col_t2, col_t3 = st.columns([5.2, 1.2, 1.2])
                 with col_t1:
                     k_badge = f'<span class="badge-mental">🧠 {t["kind"]}</span>' if t["kind"] == "Zihinsel" else f'<span class="badge-phys">🛠️ {t["kind"]}</span>'
@@ -283,17 +277,16 @@ with tab1:
                 with col_t2:
                     other_person = "Buse" if t["owner"] == "Hakan" else "Hakan"
                     if st.button("Devret ⇄", key=f"swap_{t['id']}", help="Karşı tarafa aktar"):
-                        st.session_state.tasks_v16[idx]["owner"] = other_person
-                        st.session_state.tasks_v16[idx]["assigner"] = "Devredildi"
-                        st.session_state.ai_msg_v16 = None
-                        save_tasks(st.session_state.tasks_v16) # DEĞİŞİKLİĞİ KAYDET
+                        st.session_state.tasks_v17[idx]["owner"] = other_person
+                        st.session_state.tasks_v17[idx]["assigner"] = "Devredildi"
+                        st.session_state.ai_msg_v17 = None
+                        save_tasks(st.session_state.tasks_v17)
                         st.rerun()
                 with col_t3:
                     if st.button("Bitir ✓", key=f"done_{t['id']}"):
-                        completed_task = st.session_state.tasks_v16.pop(idx)
-                        st.session_state.ai_msg_v16 = None
-                        save_tasks(st.session_state.tasks_v16) # SİLME İŞLEMİNİ KAYDET
-                        
+                        completed_task = st.session_state.tasks_v17.pop(idx)
+                        st.session_state.ai_msg_v17 = None
+                        save_tasks(st.session_state.tasks_v17)
                         if completed_task["weight"] >= 3:
                             other_p = "Hakan" if completed_task["owner"] == "Buse" else "Buse"
                             st.toast(f"💌 Harika! {completed_task['owner']} ağır bir Zihinsel Yükü temizledi. NIVO: {other_p}, ona teşekkür etmek ister misin?", icon="🎉")
@@ -301,16 +294,15 @@ with tab1:
         else:
             st.info("Harika, sistem dengede. Aktif görev bulunmuyor.")
             
-        # Tüm görevleri sıfırlama butonu (Geliştirici için)
         if st.button("🗑️ Veritabanını Sıfırla"):
-            st.session_state.tasks_v16 = DEFAULT_TASKS.copy()
-            save_tasks(st.session_state.tasks_v16)
+            st.session_state.tasks_v17 = DEFAULT_TASKS.copy()
+            save_tasks(st.session_state.tasks_v17)
             st.rerun()
 
     with col_right:
-        total_tasks = len(st.session_state.tasks_v16)
-        h_weight = sum(t["weight"] for t in st.session_state.tasks_v16 if t["owner"] == "Hakan")
-        b_weight = sum(t["weight"] for t in st.session_state.tasks_v16 if t["owner"] == "Buse")
+        total_tasks = len(st.session_state.tasks_v17)
+        h_weight = sum(t["weight"] for t in st.session_state.tasks_v17 if t["owner"] == "Hakan")
+        b_weight = sum(t["weight"] for t in st.session_state.tasks_v17 if t["owner"] == "Buse")
         tot_weight = h_weight + b_weight
         h_ratio = round((h_weight / tot_weight * 100)) if tot_weight > 0 else 50
         b_ratio = 100 - h_ratio if tot_weight > 0 else 50
@@ -321,7 +313,7 @@ with tab1:
 
         st.markdown("<div style='font-size:12.5px; font-weight:700; color:#8b9bb4; margin:0 0 8px 2px;'>📊 GÜNLÜK KOKPİT & TAHMİN</div>", unsafe_allow_html=True)
         
-        today_tasks = sum(1 for t in st.session_state.tasks_v16 if t["due"] == "Bugün")
+        today_tasks = sum(1 for t in st.session_state.tasks_v17 if t["due"] == "Bugün")
         bottleneck_msg = f"⏳ **Kritik Darboğaz Uyarısı:** Bugün teslim edilecek {today_tasks} acil iş birikti. Akşam saatlerinde stres seviyesi zirve yapabilir." if today_tasks >= 3 else ("⏳ **Darboğaz Uyarısı:** Bugün teslim edilecek görevler birikiyor." if today_tasks > 1 else "✅ Yakın vadede zamanlama darboğazı görünmüyor.")
 
         if harmony_score == 100: briefing = f"🎉 **Mükemmel Denge!** İletişiminiz kusursuz, hiçbir müdahaleye gerek yok."
@@ -337,21 +329,21 @@ with tab1:
 <div style="font-size:11.5px; color:#ef4444; background:rgba(239, 68, 68, 0.08); padding:8px; border-radius:6px; border: 1px solid rgba(239, 68, 68, 0.2);">{bottleneck_msg}</div>
 </div>""", unsafe_allow_html=True)
 
-        if harmony_score < 70 and len(st.session_state.tasks_v16) > 1:
+        if harmony_score < 70 and len(st.session_state.tasks_v17) > 1:
             st.markdown("<div class='ai-balance-btn'>", unsafe_allow_html=True)
             if st.button("🤖 NIVO AI: Acil Yük Dengele", use_container_width=True):
                 overloaded = "Hakan" if h_weight > b_weight else "Buse"
                 underloaded = "Buse" if overloaded == "Hakan" else "Hakan"
                 target_shift = abs(h_weight - b_weight) / 2
                 
-                over_tasks = [t for t in st.session_state.tasks_v16 if t["owner"] == overloaded]
+                over_tasks = [t for t in st.session_state.tasks_v17 if t["owner"] == overloaded]
                 over_tasks.sort(key=lambda x: x["weight"], reverse=True) 
                 
                 shifted_weight = 0
                 moved_count = 0
                 for t in over_tasks:
                     if shifted_weight + t["weight"] <= target_shift + 1:
-                        for main_t in st.session_state.tasks_v16:
+                        for main_t in st.session_state.tasks_v17:
                             if main_t["id"] == t["id"]:
                                 main_t["owner"] = underloaded
                                 main_t["assigner"] = "NIVO AI"
@@ -361,17 +353,17 @@ with tab1:
                     if shifted_weight >= target_shift: break
                 
                 if moved_count > 0: 
-                    st.session_state.ai_msg_v16 = f"✅ NIVO AI, eşitsizliği gidermek için {moved_count} ağır görevi {overloaded}'dan alıp {underloaded}'a devretti! Harmony skoru yükseldi."
-                    save_tasks(st.session_state.tasks_v16) # AI DENGELEMESİNİ KAYDET
+                    st.session_state.ai_msg_v17 = f"✅ NIVO AI, eşitsizliği gidermek için {moved_count} ağır görevi {overloaded}'dan alıp {underloaded}'a devretti! Harmony skoru yükseldi."
+                    save_tasks(st.session_state.tasks_v17)
                 else: 
-                    st.session_state.ai_msg_v16 = "Görev ağırlıkları bölüşüme izin vermiyor, kartlar üzerinden manuel devretmeniz önerilir."
+                    st.session_state.ai_msg_v17 = "Görev ağırlıkları bölüşüme izin vermiyor, kartlar üzerinden manuel devretmeniz önerilir."
                 st.rerun()
             st.markdown("</div>", unsafe_allow_html=True)
 
         st.markdown("<div style='font-size:12.5px; font-weight:700; color:#8b9bb4; margin:20px 0 8px 2px;'>⚖️ BİLİŞSEL EFOR İNDEKSİ</div>", unsafe_allow_html=True)
 
-        b_mental = sum(1 for t in st.session_state.tasks_v16 if t["owner"] == "Buse" and t["kind"] == "Zihinsel")
-        h_mental = sum(1 for t in st.session_state.tasks_v16 if t["owner"] == "Hakan" and t["kind"] == "Zihinsel")
+        b_mental = sum(1 for t in st.session_state.tasks_v17 if t["owner"] == "Buse" and t["kind"] == "Zihinsel")
+        h_mental = sum(1 for t in st.session_state.tasks_v17 if t["owner"] == "Hakan" and t["kind"] == "Zihinsel")
 
         st.markdown(f"""<div class="nivo-card">
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
@@ -396,7 +388,7 @@ with tab2:
     st.markdown("<div style='font-size:15px; font-weight:700; color:#f8fafc; margin:10px 0 20px 0;'>🔍 Kategori Bazlı Emek Analizi</div>", unsafe_allow_html=True)
     
     cats = {}
-    for t in st.session_state.tasks_v16:
+    for t in st.session_state.tasks_v17:
         c = t["tag"]
         if c not in cats: cats[c] = {"Hakan": 0, "Buse": 0}
         cats[c][t["owner"]] += t["weight"]
