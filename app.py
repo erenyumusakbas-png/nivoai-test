@@ -3,7 +3,7 @@ import random
 
 st.set_page_config(
     page_title="NIVO — Cognitive Balance OS",
-    page_icon="⚖️️",
+    page_icon="⚖",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -46,13 +46,12 @@ html, body, [class*="css"] { font-family: 'Inter', -apple-system, sans-serif !im
 .stSelectbox div[data-baseweb="select"] > div { background-color: #101319 !important; border: 1px solid #27303f !important; border-radius: 10px !important; color: #f1f5f9 !important; }
 div.stButton > button { background-color: #242c38 !important; color: #f8fafc !important; border: 1px solid #384558 !important; border-radius: 10px !important; font-weight: 600 !important; font-size: 13px !important; padding: 0.5rem 1rem !important; }
 div.stButton > button:hover { background-color: #2d3746 !important; border-color: #4b5c75 !important; color: #ffffff !important; }
-.btn-quick { font-size: 11px !important; padding: 2px 8px !important; }
 
 /* Etiketler (Badges) */
 .badge-category { background-color: #101319; border: 1px solid #27303f; color: #94a3b8; border-radius: 6px; padding: 3px 8px; font-size: 10.5px; font-weight: 600; }
 .badge-mental { background-color: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.25); color: #38bdf8; border-radius: 6px; padding: 3px 8px; font-size: 10.5px; font-weight: 600; }
 .badge-phys { background-color: rgba(148, 163, 184, 0.1); border: 1px solid rgba(148, 163, 184, 0.2); color: #cbd5e1; border-radius: 6px; padding: 3px 8px; font-size: 10.5px; font-weight: 600; }
-.badge-alert { background-color: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; border-radius: 6px; padding: 3px 8px; font-size: 10.5px; font-weight: 700; display: inline-block; margin-top:4px;}
+.badge-alert { background-color: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; border-radius: 6px; padding: 3px 8px; font-size: 10.5px; font-weight: 700; display: inline-block; margin-top:6px;}
 .badge-sync { font-size:10px; color:#10b981; background:rgba(16,185,129,0.1); padding:2px 6px; border-radius:4px; border:1px solid rgba(16,185,129,0.2); }
 
 /* Metrikler */
@@ -62,12 +61,50 @@ div.stButton > button:hover { background-color: #2d3746 !important; border-color
 .progress-track { width: 100%; height: 8px; background: #101319; border-radius: 99px; overflow: hidden; display: flex; margin-top: 12px; border: 1px solid #27303f; }
 </style>""", unsafe_allow_html=True)
 
-# Üst Bar
+# Gelişmiş WhatsApp Mesaj Havuzu
+STRESS_MSGS = [
+    "Yine mutfak darmadağın kalmış, her akşam ben toplamaktan gerçekten çok yoruldum artık.",
+    "Hep ben hatırlatıyorum, fatura son gün gelmiş yine, tek başıma yetişemiyorum.",
+    "Bıktım artık arkandan ev toplamaktan, biraz da sen sorumluluk al.",
+    "Sürekli kedi kumu al diyorum, yine unutmuşsun. Her şeyi ben mi düşüneceğim?",
+    "Market alışverişini bile ben planlıyorum, sürekli sana ne alacağını söylemekten yoruldum.",
+    "Bulaşıkları yıkamamışsın yine, akşam akşam sinirlerim bozuldu.",
+    "Kredi kartı ekstremizi kontrol ettin mi? Her ay aynı stresi yaşamaktan bıktım.",
+    "Çöpleri yine çıkarmamışsın, bu evde benden başka yaşayan yok mu?",
+    "Bütün haftasonum temizlik yapmakla geçiyor, biraz yardımcı olsan ölür müsün?",
+    "Aidatı yatırmayı unutmuşsun yine, sürekli senin arkandan iş takip etmekten çok sıkıldım."
+]
+
+CRISIS_MSGS = [
+    "Acil usta bulman lazım, banyoyu su bastı!",
+    "Araba çalışmıyor, çekici çağırsana toplantıya geç kaldım.",
+    "Kombi yine E03 hatası veriyor, donduk evde hemen yetkili servisi ara.",
+    "Elektrikler gitti, sigorta attı galiba bi baksana acil.",
+    "Kedinin midesi bozuldu çok kusuyor, acil veterineri ara randevu al.",
+    "Mutfak lavabosu tıkandı, sular taşıyor acil tesisatçı bul.",
+    "Lastik patlamış, stepne de inik, n'apıcaz acil lastikçi bulsana.",
+    "Kredi kartım kopyalanmış, acil bankayı ara iptal ettir ben toplantıdayım."
+]
+
+STANDARD_MSGS = [
+    "Akşam gelirken 2 ekmekle yoğurt alır mısın?",
+    "Kedinin maması bitmiş, sipariş geçer misin?",
+    "Yarın sabah eczaneye uğrayıp vitaminleri alabilir misin?",
+    "Haftasonu için sinema bileti baksana, uzun zamandır gitmedik.",
+    "Elektrik faturası gelmiş, sana zahmet akşam yatırır mısın?",
+    "Mutfak alışverişini bugün sen halleder misin, ben geç çıkacağım.",
+    "Kuru temizlemedeki ceketleri almayı unutma gelirken.",
+    "Kombinin basıncı düşmüş, akşam gelince su basar mısın?"
+]
+
+# Üst Bar (Versiyon 7.0 Eklendi)
 head_col1, head_col2, head_col3 = st.columns([0.65, 5, 2.5])
 with head_col1: st.image(LOGO_SVG, width=46)
 with head_col2:
     st.markdown("""<div style="display:flex; flex-direction:column; justify-content:center; height:46px;">
-<div style="font-size:22px; font-weight:800; letter-spacing:0.18em; color:#ffffff; line-height:1;">NIVO</div>
+<div style="font-size:22px; font-weight:800; letter-spacing:0.18em; color:#ffffff; line-height:1;">
+NIVO <span style="font-size:11px; font-weight:700; color:#38bdf8; letter-spacing:0.05em; vertical-align:middle; margin-left:6px; background:rgba(56, 189, 248, 0.1); padding:2px 6px; border-radius:4px;">v7.0</span>
+</div>
 <div style="font-size:9.5px; color:#8b9bb4; letter-spacing:0.08em; text-transform:uppercase; font-weight:600; margin-top:3px;">Cognitive Balance Operating System</div>
 </div>""", unsafe_allow_html=True)
 with head_col3:
@@ -78,51 +115,51 @@ with head_col3:
 
 st.write("")
 
-# v5 Görev State Yönetimi (Sıfırdan temiz veritabanı simülasyonu)
-if "tasks_v5" not in st.session_state:
-    st.session_state.tasks_v5 = [
-        {"title": "Kedi Aşı Takvimi & Veteriner", "due": "Salı 14:00", "owner": "Buse", "tag": "Evcil Hayvan", "weight": 3, "kind": "Zihinsel", "est": "45 Dk", "sync": True, "alert": ""},
+# v7 Görev State Yönetimi (Sıfırdan temiz veritabanı simülasyonu)
+if "tasks_v7" not in st.session_state:
+    st.session_state.tasks_v7 = [
+        {"title": "Kedinin Aşı Takvimi & Veteriner", "due": "Salı 14:00", "owner": "Buse", "tag": "Evcil Hayvan", "weight": 3, "kind": "Zihinsel", "est": "45 Dk", "sync": True, "alert": ""},
         {"title": "Araç Sigorta Poliçeleri Karşılaştırma", "due": "18 Ekim", "owner": "Hakan", "tag": "Finans", "weight": 3, "kind": "Zihinsel", "est": "1.5 Saat", "sync": False, "alert": ""},
-        {"title": "Haftalık Beslenme & Taze Sebze Tedariği", "due": "Bu Akşam", "owner": "Hakan", "tag": "Lojistik", "weight": 2, "kind": "Fiziksel", "est": "40 Dk", "sync": True, "alert": ""},
     ]
 
-if "sample_v5" not in st.session_state:
-    st.session_state.sample_v5 = ""
+if "sample_v7" not in st.session_state:
+    st.session_state.sample_v7 = ""
 
 col_left, col_right = st.columns([1.2, 1], gap="medium")
 
 with col_left:
     st.markdown("""<div class="nivo-card">
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-<div style="font-weight:600; font-size:13.5px; color:#f8fafc;">WhatsApp NLP Motoru & Duygu Analizi</div>
-<span style="font-size:10px; color:#64748b; font-family:monospace;">Engine v5.2</span>
+<div style="font-weight:600; font-size:13.5px; color:#f8fafc;">WhatsApp Şeffaf NLP Motoru (XAI)</div>
+<span style="font-size:10px; color:#64748b; font-family:monospace;">Engine v7.0</span>
 </div>""", unsafe_allow_html=True)
 
+    # Dinamik Şablon Butonları
     c_s1, c_s2, c_s3 = st.columns(3)
     with c_s1:
         if st.button("🚨 Tükenmişlik Örneği", use_container_width=True):
-            st.session_state.sample_v5 = "Yine mutfak darmadağın kalmış, her akşam ben toplamaktan gerçekten çok yoruldum artık."
+            st.session_state.sample_v7 = random.choice(STRESS_MSGS)
             st.rerun()
     with c_s2:
         if st.button("🔧 Rutin Kriz Örneği", use_container_width=True):
-            st.session_state.sample_v5 = "Kombi yine su akıtıyor, yarın sabahtan acil usta bulup başında durman lazım."
+            st.session_state.sample_v7 = random.choice(CRISIS_MSGS)
             st.rerun()
     with c_s3:
         if st.button("🛒 Standart Örnek", use_container_width=True):
-            st.session_state.sample_v5 = "Buse gelirken eczaneden ilacımı alır mısın rica etsem?"
+            st.session_state.sample_v7 = random.choice(STANDARD_MSGS)
             st.rerun()
 
     input_text = st.text_area(
         label="Mesaj",
         label_visibility="collapsed",
-        value=st.session_state.sample_v5,
-        placeholder="Doğal bir sohbet kopyalayın...",
-        height=75
+        value=st.session_state.sample_v7,
+        placeholder="Doğal bir sohbet kopyalayın veya yukarıdaki örneklerden birini seçin...",
+        height=85
     )
 
     c1, c2, c3 = st.columns([1.5, 1, 1.2])
     with c1:
-        actor = st.selectbox("İleten (Sitem Sahibi):", ["Hakan", "Buse"], label_visibility="collapsed")
+        actor = st.selectbox("İleten (Mesaj Sahibi):", ["Hakan", "Buse"], label_visibility="collapsed")
     with c2:
         do_sync = st.checkbox("Takvime İşle", value=True)
     with c3:
@@ -130,7 +167,7 @@ with col_left:
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Parser & Sentiment Analyzer Logic
+    # Açıklanabilir NLP Parser (Explainable AI Logic)
     if sync_btn and input_text.strip():
         txt = input_text.lower()
         title = "Rutin Koordinasyon"
@@ -139,36 +176,51 @@ with col_left:
         kind = "Fiziksel"
         est_time = "15 Dk"
         alert_msg = ""
+        is_stressed = False
 
-        # Tükenmişlik (Burnout) Check
-        stress_words = ["yine", "hep", "yoruldum", "bıktım", "tek başıma", "sürekli", "artık"]
-        is_stressed = any(sw in txt for sw in stress_words)
-        if is_stressed:
-            alert_msg = "⚠️ Tükenmişlik Sinyali Algılandı"
-            w += 1 # Stresli işin ağırlığı artar
+        # Tükenmişlik (Burnout) Check & XAI
+        stress_words = ["yine", "hep", "yoruldum", "bıktım", "tek başıma", "sürekli", "artık", "gına", "sıkıldım", "çıldıracağım", "sinirlerim"]
+        found_stress = [word for word in stress_words if word in txt]
+        
+        if found_stress:
+            is_stressed = True
+            words_str = ", ".join([f"'{sw}'" for sw in found_stress])
+            alert_msg = f"⚠️ Pasif-agresif kalıp tespit edildi: {words_str}"
+            w += 1 
+            
+        # Acil Kriz Check & XAI
+        urgent_words = ["acil", "hemen", "kaldım", "patlamış", "bas", "taşı", "çabuk", "bozuldu", "çalışmıyor"]
+        found_urgent = [word for word in urgent_words if word in txt]
+        
+        if found_urgent:
+            words_str = ", ".join([f"'{uw}'" for uw in found_urgent])
+            alert_msg = f"🚨 Kriz Uyarı: Aciliyet tespit edildi ({words_str})"
+            w += 1
+            est_time = "Öncelikli"
 
-        if any(k in txt for k in ["veteriner", "kedi", "mama", "aşı"]):
-            title, category, w, kind, est_time = "Evcil Hayvan Sağlık Takibi", "Evcil Hayvan", 3, "Zihinsel", "45 Dk"
-        elif any(k in txt for k in ["fatura", "kira", "sigorta", "ödeme"]):
-            title, category, w, kind, est_time = "Finans & Bütçe Yönetimi", "Finans", 3, "Zihinsel", "30 Dk"
-        elif any(k in txt for k in ["market", "kahve", "eczane", "ilaç"]):
-            title, category, w, kind, est_time = "Dış İkmal & Lojistik", "Lojistik", 2, "Fiziksel", "1 Saat"
-        elif any(k in txt for k in ["usta", "servis", "kombi", "tamir"]):
-            title, category, w, kind, est_time = "Teknik Bakım Koordinasyonu", "Ev Düzeni", 3, "Zihinsel", "2.5 Saat"
-        elif any(k in txt for k in ["temizlik", "çöp", "bulaşık", "mutfak"]):
-            title, category, w, kind, est_time = "Fiziksel Ev Hijyeni", "Ev Düzeni", 2, "Fiziksel", "1 Saat"
+        # Kategori Ayrımı
+        if any(k in txt for k in ["veteriner", "kedi", "mama", "aşı", "köpek", "kum"]):
+            title, category, w, kind, est_time = "Evcil Hayvan Sağlık/Tedarik", "Evcil Hayvan", max(2, w), "Zihinsel", "45 Dk"
+        elif any(k in txt for k in ["fatura", "kira", "sigorta", "ödeme", "kredi", "aidat", "ekstre"]):
+            title, category, w, kind, est_time = "Finans & Bütçe Yönetimi", "Finans", max(3, w), "Zihinsel", "30 Dk"
+        elif any(k in txt for k in ["market", "kahve", "eczane", "ilaç", "ekmek", "su", "sipariş", "sebze", "manav"]):
+            title, category, w, kind, est_time = "Dış İkmal & Lojistik", "Lojistik", max(2, w), "Fiziksel", "1 Saat"
+        elif any(k in txt for k in ["usta", "servis", "kombi", "tamir", "çekici", "çilingir", "tesisat", "elektrik"]):
+            title, category, w, kind, est_time = "Teknik Bakım Koordinasyonu", "Ev Düzeni", max(3, w), "Zihinsel", "2.5 Saat"
+        elif any(k in txt for k in ["temizlik", "çöp", "bulaşık", "mutfak", "çamaşır", "süpür", "havlu"]):
+            title, category, w, kind, est_time = "Fiziksel Ev Hijyeni", "Ev Düzeni", max(2, w), "Fiziksel", "45 Dk"
         else:
             title = input_text[:30].strip() + "..."
 
-        due = "Yarın" if "yarın" in txt else ("Bu Akşam" if "akşam" in txt else "Yakında")
+        due = "Bugün" if found_urgent else ("Yarın" if "yarın" in txt else ("Bu Akşam" if "akşam" in txt else "Yakında"))
         
-        # Eğer mesajda stres varsa, owner o kişi olmasın, karşı tarafa önerilsin.
+        # Eğer mesajda stres varsa, partner tavsiye et
         assigned_owner = actor
         if is_stressed:
             assigned_owner = "Buse" if actor == "Hakan" else "Hakan"
 
-        st.session_state.tasks_v5.insert(0, {
-            "title": title,
+        st.session_state.tasks_v7.insert(0, {
+            "title": title.title(),
             "due": due,
             "owner": assigned_owner,
             "tag": category,
@@ -178,27 +230,27 @@ with col_left:
             "sync": do_sync,
             "alert": alert_msg
         })
-        st.session_state.sample_v5 = ""
+        st.session_state.sample_v7 = ""
         st.rerun()
 
     # Görev Listesi Render
     st.markdown("<div style='font-size:12.5px; font-weight:700; color:#8b9bb4; margin:16px 0 8px 2px;'>📋 AKTİF ZİHİNSEL & FİZİKSEL ENVANTER</div>", unsafe_allow_html=True)
 
-    if st.session_state.tasks_v5:
-        for idx, t in enumerate(list(st.session_state.tasks_v5)):
+    if st.session_state.tasks_v7:
+        for idx, t in enumerate(list(st.session_state.tasks_v7)):
             col_t1, col_t2, col_t3 = st.columns([4.8, 1.2, 1.2])
             with col_t1:
                 k_badge = f'<span class="badge-mental">🧠 {t["kind"]}</span>' if t["kind"] == "Zihinsel" else f'<span class="badge-phys">🛠️ {t["kind"]}</span>'
                 s_badge = f'<span class="badge-sync">🗓️ Sync</span>' if t.get("sync") else ""
                 a_badge = f'<div class="badge-alert">{t["alert"]}</div>' if t.get("alert") else ""
-                stars = "⚡" * t["weight"]
+                stars = "⚡" * min(t["weight"], 5)
                 
                 item_html = f"""<div class="nivo-card" style="margin-bottom:8px; padding:14px 16px;">
 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
 <div>
 <div style="font-weight:600; font-size:13.5px; color:#f1f5f9; margin-bottom:4px;">{t['title']}</div>
 <div style="font-size:11.5px; color:#8b9bb4; margin-bottom:6px;">⏱️ {t['due']} &nbsp;•&nbsp; 👤 <b>{t['owner']}</b> &nbsp;•&nbsp; ⏳ {t.get("est", "N/A")}</div>
-<div style="display:flex; gap:6px; align-items:center;">
+<div style="display:flex; gap:6px; align-items:center; flex-wrap: wrap;">
 {k_badge} <span class="badge-category">{t['tag']}</span> <span style="font-size:10px;" title="Zorluk Derecesi">{stars}</span> {s_badge}
 </div>
 {a_badge}
@@ -209,11 +261,11 @@ with col_left:
             with col_t2:
                 other_person = "Buse" if t["owner"] == "Hakan" else "Hakan"
                 if st.button("Devret ⇄", key=f"swap_{idx}"):
-                    st.session_state.tasks_v5[idx]["owner"] = other_person
+                    st.session_state.tasks_v7[idx]["owner"] = other_person
                     st.rerun()
             with col_t3:
                 if st.button("Bitir ✓", key=f"done_{idx}"):
-                    st.session_state.tasks_v5.pop(idx)
+                    st.session_state.tasks_v7.pop(idx)
                     st.rerun()
     else:
         st.info("Harika, sistem dengede. Aktif görev bulunmuyor.")
@@ -221,15 +273,15 @@ with col_left:
 with col_right:
     st.markdown("<div style='font-size:12.5px; font-weight:700; color:#8b9bb4; margin:0 0 8px 2px;'>⚖️ BİLİŞSEL YÜK ANALİTİĞİ</div>", unsafe_allow_html=True)
 
-    h_weight = sum(t["weight"] for t in st.session_state.tasks_v5 if t["owner"] == "Hakan")
-    b_weight = sum(t["weight"] for t in st.session_state.tasks_v5 if t["owner"] == "Buse")
+    h_weight = sum(t["weight"] for t in st.session_state.tasks_v7 if t["owner"] == "Hakan")
+    b_weight = sum(t["weight"] for t in st.session_state.tasks_v7 if t["owner"] == "Buse")
     tot_weight = h_weight + b_weight
 
     h_ratio = round((h_weight / tot_weight * 100)) if tot_weight > 0 else 50
     b_ratio = 100 - h_ratio if tot_weight > 0 else 50
 
-    h_mental = sum(1 for t in st.session_state.tasks_v5 if t["owner"] == "Hakan" and t["kind"] == "Zihinsel")
-    b_mental = sum(1 for t in st.session_state.tasks_v5 if t["owner"] == "Buse" and t["kind"] == "Zihinsel")
+    h_mental = sum(1 for t in st.session_state.tasks_v7 if t["owner"] == "Hakan" and t["kind"] == "Zihinsel")
+    b_mental = sum(1 for t in st.session_state.tasks_v7 if t["owner"] == "Buse" and t["kind"] == "Zihinsel")
 
     card_stat = f"""<div class="nivo-card">
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -255,15 +307,18 @@ with col_right:
 </div>"""
     st.markdown(card_stat, unsafe_allow_html=True)
 
-    # Duygu Analizi / Tükenmişlik Radarı Sonucu
-    has_alert = any(t.get("alert") for t in st.session_state.tasks_v5)
-    if has_alert:
+    # Açıklanabilir (Explainable) Duygu Radarı 
+    alerts = [t.get("alert") for t in st.session_state.tasks_v7 if t.get("alert")]
+    if alerts:
         radar_title = "🚨 Stres ve Duygu Radarı Aktif"
-        radar_msg = "Sistem iletişimde **tükenmişlik ve sitem** tespit etti. Bu durum zihinsel yükün eşitsiz dağıldığının net göstergesidir. Lütfen kriz anındaki görevleri doğrudan diğer partnere devredin."
+        unique_alerts = list(set(alerts)) # Aynı uyarıları teke düşür
+        alerts_html = "<br>".join([f"• <span style='color:#f87171;'>{a}</span>" for a in unique_alerts])
+        
+        radar_msg = f"Sistem iletişimde şu sinyalleri yakaladı:<br><div style='margin-top:6px; margin-bottom:6px; padding:8px; background:rgba(239, 68, 68, 0.05); border-radius:6px; font-family:monospace;'>{alerts_html}</div>Zihinsel yük eşitsiz dağılıyor. Lütfen kriz anındaki görevleri doğrudan partnerinize devredin."
         radar_border = "border-color: #ef4444;"
     else:
         radar_title = "💚 İletişim Tonu Sağlıklı"
-        radar_msg = "Son mesajlarda pasif-agresif veya yorgun bir ton tespit edilmedi. Psikolojik ve zihinsel iletişim akışı sağlıklı devam ediyor."
+        radar_msg = "Sistem iletişimde herhangi bir <i>(örn: 'bıktım', 'hep', 'sürekli', vb.)</i> pasif-agresif veya yorgun kalıp tespit etmedi. Zihinsel iletişim akışı sağlıklı devam ediyor."
         radar_border = "border-color: #10b981;"
 
     st.markdown(f"""<div class="nivo-card" style="border-left: 3px solid transparent; {radar_border}">
